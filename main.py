@@ -5,15 +5,15 @@ from fastapi_jwt_auth.exceptions import AuthJWTException
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
 
-from booth.model import Booth
-from booth.router import booth_router
-from database import Base, engine
-from menu.model import Menu
-from menu.router import menu_router
-from order.model import Order, OrderLine
-from order.router import order_router
-from user.model import User
-from user.router import user_router
+from domain.booth.model import Booth
+from domain.booth.router import booth_router
+from database import engine
+from domain.menu.model import Menu
+from domain.menu.router import menu_router
+from domain.order.model import Order, OrderLine
+from domain.order.router import order_router
+from domain.user.model import User
+from domain.user.router import user_router
 
 app = FastAPI()
 Booth.metadata.create_all(bind=engine)
