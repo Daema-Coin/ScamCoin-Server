@@ -9,7 +9,11 @@ from util import get_current_booth
 menu_router = APIRouter(prefix="/menu")
 
 
-@menu_router.post('', status_code=201)
+@menu_router.post(
+    '',
+    status_code=201,
+    description='메뉴 생성'
+)
 def create_menu(request: CreateMenuRequest, auth: AuthJWT = Depends()) -> None:
     booth = get_current_booth(auth)
     menu = Menu.of(request, booth.id)
@@ -17,7 +21,11 @@ def create_menu(request: CreateMenuRequest, auth: AuthJWT = Depends()) -> None:
     session.commit()
 
 
-@menu_router.put('/{menu_id}', status_code=204)
+@menu_router.put(
+    '/{menu_id}',
+    status_code=204,
+    description='상품 판매 가능 여부 변경'
+)
 def update_sellable(menu_id: int, auth: AuthJWT = Depends()):
     booth = get_current_booth(auth)
     menu = session.query(Menu).filter_by(id=menu_id).one()
