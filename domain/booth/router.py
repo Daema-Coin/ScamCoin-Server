@@ -8,7 +8,7 @@ from domain.booth.model import Booth
 booth_router = APIRouter(prefix="/booth")
 
 
-@booth_router.post('/login')
+@booth_router.post('/login', status_code=201, response_model=BoothLoginResponse)
 def login(request: BoothLoginRequest, auth: AuthJWT = Depends()):
     booth = session.query(Booth).filter_by(auth_code=request.auth_code).first()
     if booth is None:

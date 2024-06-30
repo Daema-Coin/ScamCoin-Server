@@ -11,6 +11,11 @@ class TokenResponse(BaseModel):
     token: str
 
 
+class GrantCoinRequest(BaseModel):
+    user_ids: list[int]
+    amount: int
+
+
 class LoginRequest(BaseModel):
     account_id: str
     password: str
