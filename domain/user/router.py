@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 
-from domain.user.dto import GetUserCoinResponse, LoginRequest
+from database import session
+from domain.user.dto import GetUserCoinResponse, LoginRequest, GetUsersResponse, UserResponse
+from domain.user.model import User
 from domain.user.service import user_login
-from util import get_current_user
+from util import get_current_user, check_is_admin
 
 user_router = APIRouter(prefix="/user")
 
@@ -22,3 +24,10 @@ def get_user_coin(auth: AuthJWT = Depends()):
     return GetUserCoinResponse(
         coin=user.coin_balance
     )
+
+
+@user_router.get('/')
+def get_users(auth: AuthJWT = Depends()):
+    check_is_admin(auth)
+    users = [UserResponse.from_orm(user) for user in session.query(User).all()]
+    return GetUsersResponse(users=users)

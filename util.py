@@ -29,3 +29,10 @@ def get_current_booth(authorize: AuthJWT):
         raise invalid_user_exception
 
     return current_booth
+
+
+def check_is_admin(auth: AuthJWT):
+    booth = get_current_booth(auth)
+    if not booth.is_admin:
+        raise HTTPException(status_code=403, detail='Invalid Role')
+
