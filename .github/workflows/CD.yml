@@ -40,4 +40,5 @@ jobs:
           script: |
             cd coin
             docker pull jobis1111/coin-server
+            docker rm -rf coin-server
             docker run -dp 8000:8000 --name coin-server --env-file .env --network jobis_app-network jobis1111/coin-server
