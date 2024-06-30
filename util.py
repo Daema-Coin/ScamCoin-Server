@@ -15,7 +15,7 @@ def _get_token_subject(auth: AuthJWT) -> str:
 
 
 def _check_token_type(auth: AuthJWT, typ: str):
-    if auth.get_raw_jwt()['type'] != typ:
+    if auth.get_raw_jwt()['auth'] != typ:
         raise invalid_token_exception
 
 

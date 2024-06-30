@@ -47,7 +47,7 @@ def user_login(account_id: str, password: str, auth: AuthJWT):
     token = auth.create_access_token(
         subject=user.id,
         user_claims={
-            'type': 'user'
+            'auth': 'user'
         },
         algorithm='HS256',
         expires_time=60 * 60 * 24)
