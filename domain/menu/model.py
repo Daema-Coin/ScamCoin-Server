@@ -26,3 +26,6 @@ class Menu(Base):
             is_open=True,
             booth_id=booth_id
         )
+
+    def update_sellable(self):
+        self.is_open = not self.is_open

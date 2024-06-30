@@ -33,7 +33,6 @@ def grant_coin(request: GrantCoinRequest, auth: AuthJWT = Depends()):
     users = session.query(User).filter(User.id.in_(request.user_ids))
     for user in users:
         user.grant_point(request.amount)
-    session.add_all(users)
     session.commit()
 
 
