@@ -3,6 +3,7 @@ from fastapi.requests import Request
 from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
 from pydantic import BaseModel
+from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
 from domain.booth.model import Booth
@@ -21,6 +22,16 @@ Menu.metadata.create_all(bind=engine)
 Order.metadata.create_all(bind=engine)
 OrderLine.metadata.create_all(bind=engine)
 User.metadata.create_all(bind=engine)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        'http://localhost:5173',
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class Settings(BaseModel):
