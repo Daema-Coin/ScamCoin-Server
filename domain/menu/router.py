@@ -46,7 +46,10 @@ def update_sellable(menu_id: int, auth: AuthJWT = Depends()):
 )
 def get_my_menu(auth: AuthJWT = Depends()):
     current_booth = get_current_booth(auth)
-    return get_booth_menu_by_id(current_booth.id)
+    return get_booth_menu_by_id(
+        booth_id=current_booth.id,
+        hide_sold_out=False
+    )
 
 
 @menu_router.get(
@@ -55,4 +58,7 @@ def get_my_menu(auth: AuthJWT = Depends()):
     description='부스 매뉴 조회'
 )
 def get_booth_menu(booth_id: int):
-    return get_booth_menu_by_id(booth_id)
+    return get_booth_menu_by_id(
+        booth_id=booth_id,
+        hide_sold_out=True
+    )
