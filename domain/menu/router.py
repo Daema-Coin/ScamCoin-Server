@@ -4,7 +4,7 @@ from fastapi_jwt_auth import AuthJWT
 from database import get_db, transaction
 from domain.menu.dto import CreateMenuRequest, GetMenusResponse
 from domain.menu.model import Menu
-from domain.menu.service import get_booth_menu_by_id
+from domain.menu.service import get_booth_menu_by_id, get_menu_with_validation
 from util import get_current_booth
 
 menu_router = APIRouter(prefix="/menu")
@@ -22,7 +22,7 @@ def create_menu(request: CreateMenuRequest, auth: AuthJWT = Depends(), session=D
         session.add(menu)
 
 
-@menu_router.put(
+@menu_router.patch(
     '/{menu_id}',
     status_code=204,
     description='상품 판매 가능 여부 변경'
@@ -30,12 +30,7 @@ def create_menu(request: CreateMenuRequest, auth: AuthJWT = Depends(), session=D
 def update_sellable(menu_id: int, auth: AuthJWT = Depends(), session=Depends(get_db)):
     with transaction(session):
         booth = get_current_booth(auth, session)
-        menu = session.query(Menu).filter_by(id=menu_id).one()
-        if menu is None:
-            raise HTTPException(status_code=404, detail="Menu not found")
-        if menu.booth_id != booth.id:
-            raise HTTPException(status_code=403, detail="Invalid Booth")
-
+        menu = get_menu_with_validation(menu_id, booth.id, session)
         menu.update_sellable()
 
 
@@ -64,3 +59,19 @@ def get_booth_menu(booth_id: int, session=Depends(get_db)):
         hide_sold_out=True,
         session=session
     )
+
+
+@menu_router.put(
+    '/{menu_id}',
+    description='메뉴정보 변경'
+)
+def update_menu(
+        menu_id: int,
+        request: CreateMenuRequest,
+        session=Depends(get_db),
+        auth: AuthJWT = Depends(),
+):
+    with transaction(session):
+        booth = get_current_booth(auth, session)
+        menu = get_menu_with_validation(menu_id, booth.id, session)
+        menu.update_menu(request)

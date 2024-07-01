@@ -29,3 +29,9 @@ class Menu(Base):
 
     def update_sellable(self):
         self.is_open = not self.is_open
+
+    def update_menu(self, request: CreateMenuRequest):
+        self.name = request.name
+        self.price = request.price
+        self.description = request.description
+        self.image_url = request.image_url
