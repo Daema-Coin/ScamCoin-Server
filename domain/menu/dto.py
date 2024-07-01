@@ -9,6 +9,7 @@ class CreateMenuRequest(BaseModel):
 
 
 class MenuResponse(BaseModel):
+    id: int
     name: str
     description: str
     price: int
