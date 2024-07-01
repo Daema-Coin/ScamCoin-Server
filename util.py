@@ -1,7 +1,8 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
 from fastapi_jwt_auth import AuthJWT
+from sqlalchemy.orm import Session
 
-from database import session
+from database import get_db
 from domain.booth.model import Booth
 from domain.user.model import User
 
@@ -19,7 +20,7 @@ def _check_token_type(auth: AuthJWT, typ: str):
         raise invalid_token_exception
 
 
-def get_current_user(authorize: AuthJWT):
+def get_current_user(authorize: AuthJWT, session: Session):
     subject = _get_token_subject(authorize)
     _check_token_type(authorize, 'user')
     current_user = session.query(User).filter_by(id=subject).first()
@@ -29,7 +30,7 @@ def get_current_user(authorize: AuthJWT):
     return current_user
 
 
-def get_current_booth(authorize: AuthJWT):
+def get_current_booth(authorize: AuthJWT, session: Session):
     subject = _get_token_subject(authorize)
     _check_token_type(authorize, 'booth')
     current_booth = session.query(Booth).filter_by(id=subject).first()
@@ -39,7 +40,7 @@ def get_current_booth(authorize: AuthJWT):
     return current_booth
 
 
-def check_is_admin(auth: AuthJWT):
-    booth = get_current_booth(auth)
+def check_is_admin(auth: AuthJWT, session: Session):
+    booth = get_current_booth(auth, session)
     if not booth.is_admin:
         raise HTTPException(status_code=403, detail='Invalid Role')

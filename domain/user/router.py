@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 
-from database import session
+from database import get_db, transaction
 from domain.user.dto import GetUserCoinResponse, LoginRequest, GetUsersResponse, UserResponse, GrantCoinRequest, \
     TokenResponse
 from domain.user.model import User
@@ -19,9 +19,10 @@ user_router = APIRouter(prefix="/user")
 )
 def login(
         request: LoginRequest,
-        auth: AuthJWT = Depends()
+        auth: AuthJWT = Depends(),
+        session=Depends(get_db),
 ):
-    return user_login(request.account_id, request.password, auth)
+    return user_login(request.account_id, request.password, auth, session)
 
 
 @user_router.get(
@@ -29,8 +30,8 @@ def login(
     response_model=GetUserCoinResponse,
     description='내 코인 잔액 조회'
 )
-def get_user_coin(auth: AuthJWT = Depends()):
-    user = get_current_user(auth)
+def get_user_coin(auth: AuthJWT = Depends(), session=Depends(get_db)):
+    user = get_current_user(auth, session)
     return GetUserCoinResponse(
         coin=user.coin_balance
     )
@@ -41,12 +42,12 @@ def get_user_coin(auth: AuthJWT = Depends()):
     status_code=204,
     description='코인 부여'
 )
-def grant_coin(request: GrantCoinRequest, auth: AuthJWT = Depends()):
-    check_is_admin(auth)
-    users = session.query(User).filter(User.id.in_(request.user_ids))
-    for user in users:
-        user.grant_point(request.amount)
-    session.commit()
+def grant_coin(request: GrantCoinRequest, auth: AuthJWT = Depends(), session=Depends(get_db)):
+    with transaction(session):
+        check_is_admin(auth, session)
+        users = session.query(User).filter(User.id.in_(request.user_ids))
+        for user in users:
+            user.grant_point(request.amount)
 
 
 @user_router.get(
@@ -54,7 +55,7 @@ def grant_coin(request: GrantCoinRequest, auth: AuthJWT = Depends()):
     response_model=GetUsersResponse,
     description='학생 정보 전체 조회'
 )
-def get_users(auth: AuthJWT = Depends()):
-    check_is_admin(auth)
+def get_users(auth: AuthJWT = Depends(), session=Depends(get_db)):
+    check_is_admin(auth, session)
     users = [UserResponse.from_orm(user) for user in session.query(User).all()]
     return GetUsersResponse(users=users)

@@ -1,8 +1,9 @@
 import requests
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
 from fastapi_jwt_auth import AuthJWT
+from sqlalchemy.orm import Session
 
-from database import session
+from database import get_db, transaction
 from domain.user.dto import TokenResponse
 from domain.user.model import User
 
@@ -15,7 +16,7 @@ def _format_student_gcn(grade: int, class_num: int, student_num: int) -> str:
     return student_id
 
 
-def user_login(account_id: str, password: str, auth: AuthJWT):
+def user_login(account_id: str, password: str, auth: AuthJWT, session: Session):
     param = {
         'account_id': account_id,
         'password': password
@@ -35,14 +36,14 @@ def user_login(account_id: str, password: str, auth: AuthJWT):
         student_num=result['num']
     )
     if user is None:
-        user = User(
-            account_id=account_id,
-            name=result['name'],
-            gcn=gcn,
-            coin_balance=0
-        )
-        session.add(user)
-        session.commit()
+        with transaction(session):
+            user = User(
+                account_id=account_id,
+                name=result['name'],
+                gcn=gcn,
+                coin_balance=0
+            )
+            session.add(user)
 
     token = auth.create_access_token(
         subject=user.id,

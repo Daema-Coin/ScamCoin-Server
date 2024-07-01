@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi_jwt_auth import AuthJWT
 
-from database import session
+from database import get_db
 from domain.booth.dto import BoothLoginRequest, BoothLoginResponse, GetBoothInfoResponse
 from domain.booth.model import Booth
 from util import get_current_booth
@@ -15,7 +15,7 @@ booth_router = APIRouter(prefix="/booth")
     response_model=BoothLoginResponse,
     description='부스 로그인'
 )
-def login(request: BoothLoginRequest, auth: AuthJWT = Depends()):
+def login(request: BoothLoginRequest, auth: AuthJWT = Depends(), session=Depends(get_db)):
     booth = session.query(Booth).filter_by(auth_code=request.auth_code).first()
     if booth is None:
         raise HTTPException(status_code=401, detail="Invalid auth code")
@@ -39,6 +39,6 @@ def login(request: BoothLoginRequest, auth: AuthJWT = Depends()):
     response_model=GetBoothInfoResponse,
     description='내 부스 정보 조회'
 )
-def get_booth_info(auth: AuthJWT = Depends()):
-    current_booth = get_current_booth(auth)
+def get_booth_info(auth: AuthJWT = Depends(), session=Depends(get_db)):
+    current_booth = get_current_booth(auth, session)
     return GetBoothInfoResponse.from_orm(current_booth)
