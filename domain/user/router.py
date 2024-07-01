@@ -51,7 +51,7 @@ def grant_coin(request: GrantCoinRequest, auth: AuthJWT = Depends(), session=Dep
 
 
 @user_router.get(
-    '/',
+    '',
     response_model=GetUsersResponse,
     description='학생 정보 전체 조회'
 )
