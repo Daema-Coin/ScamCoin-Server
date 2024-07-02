@@ -14,8 +14,7 @@ def create_order(order_requests: OrderRequest, session: Session, authorize: Auth
                       request=order_requests.request,
                       status="request",
                       price=order_requests.price)
+        session.add(order)
 
         order_line = [OrderLine(order.id, menu.menu_id) for menu in order_requests.orders]
-
-        session.add(order)
         session.add_all(order_line)
