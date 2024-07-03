@@ -11,6 +11,9 @@ class Order(Base):
     status = Column(String(10), nullable=False)
     price = Column(Integer, nullable=False)
 
+    def update_order(self, status: str):
+        self.status = status
+
 
 class OrderLine(Base):
     __tablename__ = "order_line"
