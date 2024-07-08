@@ -12,6 +12,7 @@ fastapi-jwt-auth = "*"
 pydantic = "==1.10.11"
 alembic = "*"
 requests = "*"
+sse-starlette = "*"
 
 [dev-packages]
 

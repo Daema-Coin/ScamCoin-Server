@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
 
 from database import Base
 from domain.menu.dto import CreateMenuRequest
@@ -14,6 +15,7 @@ class Menu(Base):
     image_url = Column(String(100), nullable=False)
     is_open = Column(Boolean, nullable=False)
     booth_id = Column(Integer, ForeignKey('booth.id'), nullable=False)
+    order_lines = relationship("OrderLine", back_populates="menu")
 
     @staticmethod
     def of(dto: CreateMenuRequest, booth_id: int):
