@@ -27,8 +27,11 @@ def user_login(account_id: str, password: str, auth: AuthJWT, session: Session):
         raise HTTPException(status_code=401, detail='Invalid Password')
     if result.status_code == 404:
         raise HTTPException(status_code=404, detail='User not found')
+    if result.status_code == 500:
+        raise HTTPException(status_code=500, detail='Other Server Error')
 
     result = result.json()
+    print(result)
     user = session.query(User).filter_by(account_id=account_id).first()
     gcn = _format_student_gcn(
         grade=result['grade'],
