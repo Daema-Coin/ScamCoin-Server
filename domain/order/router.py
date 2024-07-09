@@ -1,10 +1,11 @@
 import asyncio
+import json
 
 from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy import select
 from sqlalchemy.orm import Session, join, joinedload
-from sse_starlette import EventSourceResponse
+from sse_starlette import EventSourceResponse, ServerSentEvent
 
 from database import get_db, transaction
 from domain.booth.model import Booth
@@ -33,17 +34,17 @@ def update_order_status(status: str, order_id: int, auth: AuthJWT = Depends(), s
         order.update_order(status)
 
 
-async def event_generator():
+async def event_generator(booth_id: int):
     while True:
         data = await event_queue.get()
-        yield {
-            "order": data
-        }
+        if data['booth_id'] == booth_id:
+            yield ServerSentEvent(data=json.dumps(data), event="order")
 
 
 @order_router.get("/")
-async def query_order_sse():
-    return EventSourceResponse(event_generator())
+async def query_order_sse(session: Session = Depends(get_db), auth: AuthJWT = Depends()):
+    booth = get_current_booth(auth, session)
+    return EventSourceResponse(event_generator(booth.id))
 
 
 @order_router.get("/lists", response_model=QueryOrderLists, description='주문 내역 조회')  # status = request/done

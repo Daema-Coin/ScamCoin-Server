@@ -10,6 +10,7 @@ class OrderRequest(BaseModel):
     orders: list[OrderList]
     request: str
     price: int
+    booth_id: int
 
 
 class Menu(BaseModel):
