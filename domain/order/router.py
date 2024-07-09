@@ -26,12 +26,21 @@ async def order(request: OrderRequest, session=Depends(get_db), auth: AuthJWT = 
     await event_queue.put(request.dict())
 
 
-@order_router.put("/{order_id}", status_code=204, description='주문 상태 변경')  # status = request/done
+@order_router.put("/{order_id}", status_code=204, description='주문 상태 변경')  # status = request/done/cancel
 def update_order_status(status: str, order_id: int, auth: AuthJWT = Depends(), session: Session = Depends(get_db)):
     with transaction(session):
         get_current_booth(auth, session)
         order = session.query(Order).filter_by(id=order_id).first()
-        order.update_order(status)
+
+        if status == 'done':
+            order.update_order(status)
+            order_lines = session.query(OrderLine).filter_by(order_id=order.id).all()
+            for order_line in order_lines:
+                menu = session.query(Menu).filter_by(id=order_line.menu_id).first()
+                menu.update_sell_count(order_line.amount)
+
+        elif status == 'cancel':
+            session.delete(order)
 
 
 async def event_generator(booth_id: int):

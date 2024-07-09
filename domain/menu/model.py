@@ -37,3 +37,6 @@ class Menu(Base):
         self.price = request.price
         self.description = request.description
         self.image_url = request.image_url
+
+    def update_sell_count(self, amount: int):
+        self.sell_count += amount
