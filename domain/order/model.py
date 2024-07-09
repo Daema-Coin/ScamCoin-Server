@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, PrimaryKeyConstraint, ForeignKey
 from sqlalchemy.orm import relationship
 
 from database import Base
+from domain.order.dto import OrderList
 
 
 class Order(Base):

@@ -21,7 +21,7 @@ event_queue = asyncio.Queue()
 
 @order_router.post("/", status_code=201, description="주문")
 async def order(request: OrderRequest, session=Depends(get_db), auth: AuthJWT = Depends()):
-    create_order(request)
+    create_order(request, session, auth)
     await event_queue.put(request.dict())
 
 

@@ -15,6 +15,11 @@ def create_order(order_requests: OrderRequest, session: Session, authorize: Auth
                       status="request",
                       price=order_requests.price)
         session.add(order)
+        session.commit()
 
-        order_line = [OrderLine(order.id, menu.menu_id, menu.amount) for menu in order_requests.orders]
+        order_line = [
+            OrderLine(order_id=order.id, menu_id=menu.menu_id, amount=menu.amount)
+            for menu in order_requests.orders
+        ]
+        user.decrease_coin(order_requests.price)
         session.add_all(order_line)
