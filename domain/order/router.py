@@ -1,7 +1,7 @@
 import asyncio
 import json
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy import select
 from sqlalchemy.orm import Session, join, joinedload
@@ -13,6 +13,7 @@ from domain.menu.model import Menu
 from domain.order.dto import OrderRequest, QueryOrderLists, QueryOrder
 from domain.order.model import Order, OrderLine
 from domain.order.service import create_order
+from domain.user.model import User
 from util import get_current_booth
 
 order_router = APIRouter(prefix="/order")
@@ -31,6 +32,8 @@ def update_order_status(status: str, order_id: int, auth: AuthJWT = Depends(), s
     with transaction(session):
         get_current_booth(auth, session)
         order = session.query(Order).filter_by(id=order_id).first()
+        if order is None:
+            raise HTTPException(status_code=404, detail='Order Not Found')
 
         if status == 'done':
             order.update_order(status)
@@ -40,6 +43,8 @@ def update_order_status(status: str, order_id: int, auth: AuthJWT = Depends(), s
                 menu.update_sell_count(order_line.amount)
 
         elif status == 'cancel':
+            user = session.query(User).filter_by(id=order.user_id).one_or_none()
+            user.grant_point(order.price)
             session.delete(order)
 
 

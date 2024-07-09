@@ -12,6 +12,7 @@ class Order(Base):
     request = Column(String(100), nullable=False)
     status = Column(String(10), nullable=False)
     price = Column(Integer, nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     order_lines = relationship("OrderLine", back_populates="order", cascade="all, delete-orphan")
 
     def update_order(self, status: str):
