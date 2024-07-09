@@ -3,12 +3,10 @@ import json
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_jwt_auth import AuthJWT
-from sqlalchemy import select
-from sqlalchemy.orm import Session, join, joinedload
+from sqlalchemy.orm import Session
 from sse_starlette import EventSourceResponse, ServerSentEvent
 
 from database import get_db, transaction
-from domain.booth.model import Booth
 from domain.menu.model import Menu
 from domain.order.dto import OrderRequest, QueryOrderLists, QueryOrder
 from domain.order.model import Order, OrderLine

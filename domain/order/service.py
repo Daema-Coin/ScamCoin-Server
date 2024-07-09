@@ -10,10 +10,13 @@ from util import get_current_user
 def create_order(order_requests: OrderRequest, session: Session, authorize: AuthJWT):
     with transaction(session):
         user = get_current_user(authorize, session)
-        order = Order(orderer_name=user.name,
-                      request=order_requests.request,
-                      status="request",
-                      price=order_requests.price)
+        order = Order(
+            orderer_name=user.name,
+            request=order_requests.request,
+            status="request",
+            price=order_requests.price,
+            user_id=user.id
+        )
         session.add(order)
         session.flush()
 
