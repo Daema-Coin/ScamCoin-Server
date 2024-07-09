@@ -15,7 +15,7 @@ def create_order(order_requests: OrderRequest, session: Session, authorize: Auth
                       status="request",
                       price=order_requests.price)
         session.add(order)
-        session.commit()
+        session.flush()
 
         order_line = [
             OrderLine(order_id=order.id, menu_id=menu.menu_id, amount=menu.amount)
