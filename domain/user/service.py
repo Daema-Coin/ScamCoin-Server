@@ -17,12 +17,12 @@ def _format_student_gcn(grade: int, class_num: int, student_num: int) -> str:
 
 
 def user_login(account_id: str, password: str, auth: AuthJWT, session: Session):
-    param = {
+    datas = {
         'account_id': account_id,
         'password': password
     }
 
-    result = requests.get(XQUARE_API_SERVER, params=param)
+    result = requests.post(XQUARE_API_SERVER, data=datas)
     if result.status_code == 401:
         raise HTTPException(status_code=401, detail='Invalid Password')
     if result.status_code == 404:
