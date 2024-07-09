@@ -22,4 +22,5 @@ class MenuResponse(BaseModel):
 
 
 class GetMenusResponse(BaseModel):
+    booth_name: str
     menu: list[MenuResponse]
