@@ -1,9 +1,9 @@
 import requests
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session
 
-from database import get_db, transaction
+from database import transaction
 from domain.user.dto import TokenResponse
 from domain.user.model import User
 
@@ -22,7 +22,7 @@ def user_login(account_id: str, password: str, auth: AuthJWT, session: Session):
         'password': password
     }
 
-    result = requests.post(XQUARE_API_SERVER, data=datas)
+    result = requests.post(XQUARE_API_SERVER, json=datas)
     if result.status_code == 401:
         raise HTTPException(status_code=401, detail='Invalid Password')
     if result.status_code == 404:
