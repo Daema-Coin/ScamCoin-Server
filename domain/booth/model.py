@@ -10,3 +10,6 @@ class Booth(Base):
     name = Column(String(20), nullable=False)
     profit = Column(Integer, nullable=False)
     is_admin = Column(Boolean, nullable=False)
+
+    def update_profit(self, price):
+        self.profit += price
