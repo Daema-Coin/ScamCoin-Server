@@ -17,39 +17,38 @@ def _format_student_gcn(grade: int, class_num: int, student_num: int) -> str:
 
 
 def user_login(account_id: str, password: str, auth: AuthJWT, session: Session):
-    # param = {
-    #     'account_id': account_id,
-    #     'password': password
-    # }
-    #
-    # result = requests.get(XQUARE_API_SERVER, params=param)
-    # if result.status_code == 401:
-    #     raise HTTPException(status_code=401, detail='Invalid Password')
-    # if result.status_code == 404:
-    #     raise HTTPException(status_code=404, detail='User not found')
-    # if result.status_code == 500:
-    #     raise HTTPException(status_code=500, detail='Other Server Error')
-    #
-    # result = result.json()
-    # print(result)
-    # user = session.query(User).filter_by(account_id=account_id).first()
-    # gcn = _format_student_gcn(
-    #     grade=result['grade'],
-    #     class_num=result['class_num'],
-    #     student_num=result['num']
-    # )
-    # if user is None:
-    #     with transaction(session):
-    #         user = User(
-    #             account_id=account_id,
-    #             name=result['name'],
-    #             gcn=gcn,
-    #             coin_balance=0
-    #         )
-    #         session.add(user)
+    param = {
+        'account_id': account_id,
+        'password': password
+    }
+
+    result = requests.get(XQUARE_API_SERVER, params=param)
+    if result.status_code == 401:
+        raise HTTPException(status_code=401, detail='Invalid Password')
+    if result.status_code == 404:
+        raise HTTPException(status_code=404, detail='User not found')
+    if result.status_code == 500:
+        raise HTTPException(status_code=500, detail='Other Server Error')
+
+    result = result.json()
+    user = session.query(User).filter_by(account_id=account_id).first()
+    gcn = _format_student_gcn(
+        grade=result['grade'],
+        class_num=result['class_num'],
+        student_num=result['num']
+    )
+    if user is None:
+        with transaction(session):
+            user = User(
+                account_id=account_id,
+                name=result['name'],
+                gcn=gcn,
+                coin_balance=0
+            )
+            session.add(user)
 
     token = auth.create_access_token(
-        subject=1,
+        subject=user.id,
         user_claims={
             'auth': 'user'
         },
