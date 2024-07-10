@@ -43,7 +43,7 @@ def user_login(account_id: str, password: str, auth: AuthJWT, session: Session):
                 account_id=account_id,
                 name=result['name'],
                 gcn=gcn,
-                coin_balance=0
+                coin_balance=20
             )
             session.add(user)
 
