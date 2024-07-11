@@ -8,7 +8,10 @@ from domain.menu.model import Menu
 
 def get_booth_menu_by_id(booth_id: int, hide_sold_out: bool, session: Session):
     booth = session.query(Booth).filter_by(id=booth_id).one_or_none()
-    query = session.query(Menu).filter_by(booth_id=booth_id)
+    if booth is None:
+        raise HTTPException(status_code=404, detail="Booth not found")
+
+    query = session.query(Menu).filter_by(booth_id=booth.id)
     if hide_sold_out:
         query = query.filter_by(is_open=True)
     menus = query.all()

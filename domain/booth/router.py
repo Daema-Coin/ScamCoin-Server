@@ -16,7 +16,7 @@ booth_router = APIRouter(prefix="/booth")
     description='부스 로그인'
 )
 def login(request: BoothLoginRequest, auth: AuthJWT = Depends(), session=Depends(get_db)):
-    booth = session.query(Booth).filter_by(auth_code=request.auth_code).first()
+    booth = session.query(Booth).filter_by(auth_code=request.auth_code).one_or_none()
     if booth is None:
         raise HTTPException(status_code=401, detail="Invalid auth code")
 
