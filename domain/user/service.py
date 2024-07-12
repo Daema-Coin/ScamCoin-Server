@@ -32,11 +32,13 @@ def user_login(account_id: str, password: str, auth: AuthJWT, session: Session):
 
     result = result.json()
     user = session.query(User).filter_by(account_id=account_id).first()
-    gcn = _format_student_gcn(
-        grade=result['grade'],
-        class_num=result['class_num'],
-        student_num=result['num']
-    )
+    gcn = 9999
+    if result['user_role'] == 'STU':
+        gcn = _format_student_gcn(
+            grade=result['grade'],
+            class_num=result['class_num'],
+            student_num=result['num']
+        )
     if user is None:
         with transaction(session):
             user = User(
