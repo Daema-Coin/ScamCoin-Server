@@ -9,7 +9,7 @@ load_dotenv()
 Base = declarative_base()
 DATABASE_URL = (f"mysql+mysqlconnector://"
                 f"{os.getenv('DB_USERNAME')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:3306/scam_coin")
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, pool_size=20, max_overflow=5)
 session_factory = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 
